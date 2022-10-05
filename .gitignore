@@ -4,5 +4,4 @@ coverage
 *.log
 dist
 assets
-.prettierrc
-.prettierignore
+
