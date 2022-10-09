@@ -156,8 +156,8 @@ const renderStatus = (elements, i18n, value) => {
   }
 };
 
-export default (elements, i18n, state) =>
-  onChange(state, (path, value) => {
+export default (elements, i18n, state) => {
+  const processFormHandler = onChange(state, (path, value) => {
     switch (path) {
       case 'form.process':
         renderStatus(elements, i18n, value);
@@ -187,3 +187,5 @@ export default (elements, i18n, state) =>
         break;
     }
   });
+  return processFormHandler;
+};
