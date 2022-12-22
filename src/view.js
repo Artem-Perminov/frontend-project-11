@@ -105,6 +105,7 @@ const renderErrorss = (elements, i18n, value) => {
     case 'AxiosError':
       feedback.textContent = i18n.t('errors.networkError');
       break;
+
     case 'Error':
       feedback.textContent = i18n.t('errors.rssError');
       break;
@@ -156,15 +157,25 @@ const renderStatus = (elements, i18n, value) => {
   }
 };
 
-export default (elements, i18n, state) => {
-  const processFormHandler = onChange(state, (path, value) => {
+export default (elements, i18n, state) =>
+  onChange(state, (path, value) => {
     switch (path) {
-      case 'form.process':
+      case 'process.conditions':
+        renderStatus(elements, i18n, value);
+        console.log(state);
+        break;
+
+      case 'form.conditions':
         renderStatus(elements, i18n, value);
         break;
 
       case 'links':
         handleProcessSubmit(elements);
+        break;
+
+      case 'process.errors':
+        renderErrorss(elements, i18n, value);
+        console.log(state);
         break;
 
       case 'form.errors':
@@ -187,5 +198,3 @@ export default (elements, i18n, state) => {
         break;
     }
   });
-  return processFormHandler;
-};

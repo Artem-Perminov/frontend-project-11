@@ -58,7 +58,11 @@ export default () => {
 
   const state = {
     form: {
-      process: '',
+      conditions: '',
+      errors: '',
+    },
+    process: {
+      conditions: '',
       errors: '',
     },
     links: [],
@@ -95,8 +99,8 @@ export default () => {
 
     Promise.all(promises)
       .catch((err) => {
-        watchedState.form.process = 'failed';
-        watchedState.form.errors = err.name;
+        watchedState.process.conditions = 'failed';
+        watchedState.process.errors = err.name;
       })
       .finally(() => {
         setTimeout(updatePosts, delay);
@@ -105,21 +109,23 @@ export default () => {
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
-    watchedState.form.process = 'loading';
-    watchedState.form.errors = null;
 
     const form = new FormData(e.target);
     const url = form.get('url');
 
     validate(url, watchedState.links)
       .then((validUrl) => {
+        watchedState.process.conditions = 'loading';
+        watchedState.process.errors = null;
         axios
           .get(getProxiedUrl(validUrl))
           .then((response) => {
             const { feed, posts } = parser(response.data.contents);
 
             watchedState.links.push(validUrl);
-            watchedState.form.process = 'success';
+            watchedState.process.conditions = 'success';
+            watchedState.form.conditions = '';
+            watchedState.form.errors = null;
 
             const id = _.uniqueId();
             watchedState.feeds.push({ ...feed, id, link: validUrl });
@@ -127,13 +133,17 @@ export default () => {
             posts.forEach((post) => watchedState.posts.push({ ...post, id }));
           })
           .catch((err) => {
-            watchedState.form.process = 'failed';
-            watchedState.form.errors = err.name;
+            watchedState.process.conditions = 'failed';
+            watchedState.process.errors = err.name;
+            watchedState.form.conditions = '';
+            watchedState.form.errors = '';
           });
       })
       .catch((err) => {
-        watchedState.form.process = 'failed';
+        watchedState.form.conditions = 'failed';
         watchedState.form.errors = err.errors.join();
+        watchedState.process.conditions = '';
+        watchedState.process.errors = null;
       });
   });
 
