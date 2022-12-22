@@ -5,7 +5,6 @@ import axios from 'axios';
 import watcher from './view.js';
 import languages from './translations/languages.js';
 import parser from './parser.js';
-import elements from './page-elements.js';
 
 const validate = (url, feeds) => {
   const schema = yup.string().required().url().notOneOf(feeds);
@@ -23,6 +22,19 @@ const getProxiedUrl = (url) => {
 };
 
 export default () => {
+  const elements = {
+    form: document.querySelector('.rss-form'),
+    input: document.querySelector('#url-input'),
+    button: document.querySelector('.h-100'),
+    feedback: document.querySelector('.feedback'),
+    feeds: document.querySelector('.feeds'),
+    posts: document.querySelector('.posts'),
+    modalFade: document.querySelector('#modal'),
+    modalTitle: document.querySelector('#modal .modal-title'),
+    body: document.querySelector('#modal .modal-body'),
+    redirect: document.querySelector('#modal a'),
+  };
+
   const defaultLanguage = 'ru';
   const delay = 5000;
   const i18n = i18next.createInstance();
@@ -61,7 +73,7 @@ export default () => {
   const updatePosts = () => {
     const { feeds, posts } = state;
 
-    const promise = feeds.map((feed) => {
+    const promises = feeds.map((feed) => {
       const url = getProxiedUrl(feed.link);
 
       return axios.get(url).then((response) => {
@@ -81,7 +93,7 @@ export default () => {
       });
     });
 
-    Promise.all(promise)
+    Promise.all(promises)
       .catch((err) => {
         watchedState.form.process = 'failed';
         watchedState.form.errors = err.name;
